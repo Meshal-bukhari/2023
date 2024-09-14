@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dermatology Board Exam Simulator by Meshal Bukhari</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .question {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 20px;
+        }
+        .choices {
+            list-style-type: none;
+            padding: 0;
+        }
+        .choice {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .choice:hover {
+            background-color: #e0e0e0;
+        }
+        .choice.correct {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .choice.incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .nav-button, .show-image-btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .nav-button:hover, .show-image-btn:hover {
+            background-color: #0056b3;
+        }
+        .nav-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #question-nav {
+            text-align: center;
+            margin-top: 20px;
+        }
+        #question-nav button {
+            margin: 5px;
+            padding: 5px 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        #question-nav button.current {
+            background-color: #007bff;
+            color: white;
+        }
+        #question-nav button.correct {
+            background-color: #28a745;
+            color: white;
+        }
+        #question-nav button.incorrect {
+            background-color: #dc3545;
+            color: white;
+        }
+        #start-wrong-answers, #submit-quiz, #reset-quiz {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #start-wrong-answers:hover, #submit-quiz:hover, #reset-quiz:hover {
+            background-color: #218838;
+        }
+        #score-display {
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .image-container {
+            display: none;
+            margin-top: 20px;
+        }
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dermatology Board Exam Simulator by Meshal Bukhari</h1>
+        <div id="quiz">
+            <!-- Questions will be dynamically inserted here -->
+        </div>
+        <div class="navigation">
+            <button id="prev" class="nav-button">Previous</button>
+            <button id="next" class="nav-button">Next</button>
+        </div>
+        <div id="question-nav">
+            <!-- Question number buttons will be dynamically inserted here -->
+        </div>
+        <button id="submit-quiz">Submit Quiz</button>
+        <button id="start-wrong-answers">Review Wrong Answers</button>
+        <button id="reset-quiz">Reset Quiz</button>
+        <div id="score-display"></div>
+    </div>
+
+    <script>
+        const questions = [
+        {
+                question: "What's the most likely diagnosis for a verrucus lesion over the foot, asymptomatic for 2 years, with punch biopsy shown? look for histopath image",
+                choices: ["Verruca vulgaris", "Verrucus TB", "Verrucus leishmania", "Discoid lupus"],
+                correctAnswer: 1,
+                imageUrl: "https://i.ibb.co/vd75JkL/question-1.jpg"
+            },
+            {
+               question: "A patient started to develop painful tender plaques (histopath shown of Sweet). What was the culprit medication?",
+               choices: ["Iodide", "Lenadelomide"],
+               correctAnswer: 1,
+               imageUrl: "https://i.ibb.co/MCV1mvp/3.jpg"
+},
+            {
+                question: "A patient is following up for PUD on PPI, started to develop mild joint pain, malaise and papulopustular lesions. Most likely diagnosis is:",
+                choices: ["Behçet", "Sweet", "Bowel associated DAS", "Acne fulminans"],
+                correctAnswer: 2,
+                imageUrl: "https://i.imgur.com/tuKqTdL.png"
+            },{
+    question: "Based on the clinical presentation and histopathological findings, what is the most likely diagnosis?",
+    choices: ["Pemphigus", "BP (Bullous Pemphigoid)", "Linear IGA"],
+    correctAnswer: 1, 
+    imageUrl: "https://i.imgur.com/RvUpVXY.png"
+},
+            {
+                question: "For a patient with SAPHO Syndrome, how to follow and assess involvement and monitoring?",
+                choices: ["X-ray", "Scintigraphy", "MRI"],
+                correctAnswer: 2
+            },{
+    question: "A patient presents with acute findings as shown in the image. Labs reveal neutropenia. What is the most appropriate management approach?",
+    choices: ["Systemic steroid", "Reassurance", "Chemotherapy"],
+    correctAnswer: 1, 
+    imageUrl: "https://i.imgur.com/qDNVZbm.png" 
+},
+            {
+                question: "For a pregnant atopic patient who received topical steroid, what is a possible finding in the newborn?",
+                choices: ["Fetal growth restriction", "Cleft lip, palate", "No side effect has been reported"],
+                correctAnswer: 0,
+                imageUrl: "https://i.imgur.com/RSRD07N.png"
+            },
+            {
+                question: "For an atopic patient with severe eczema started on dupilumab, what's the most reported side effect?",
+                choices: ["Conjunctivitis", "Injection site reaction"],
+                correctAnswer: 1
+            },
+            {
+    question: "A pediatric patient with Linear IGA (picture shown in Bologna classification) presents with a low hemoglobin level (around 9). What's the best treatment?",
+    choices: ["Dapsone", "Cephalxin", "Oral prednisolone"],
+    correctAnswer: 2, 
+    imageUrl: "https://i.imgur.com/5HLStAF.png" 
+},
+            {
+                question: "For a pregnant patient who develops an itchy skin rash in the third trimester sparing umbilicus (PUPPs), what's the pathogenesis?",
+                choices: ["Collagen allergic reaction (hidden antigen)"],
+                correctAnswer: 0
+            },
+            {
+                question: "For a histopathology showing mid epidermal cleft (Pemphigus foliaceus), what's the DIF substrate?",
+                choices: ["Rat bladder", "Monkey esophagus", "Normal skin"],
+                correctAnswer: 2,
+                imageUrl: "https://i.imgur.com/0puFfMy.png"
+            },
+            {
+                question: "For a patient with acute bullous pemphigoid and labs showing neutropenia, what's the management?",
+                choices: ["Systemic steroid", "Reassurance"],
+                correctAnswer: 1
+            },
+            {
+                question: "For a newborn with history of circinate bullous eruption, what's the most likely defect?",
+                choices: ["K5", "Integrin", "Laminin"],
+                correctAnswer: 0,
+                imageUrl: 'https://i.imgur.com/hlumfVL.png'
+            },{
+    question: "In Erythema toxicum neonatorum (ETN), what is the characteristic cell finding?",
+    choices: ["Neutrophils", "Eosinophils", "Lymphocytes", "Basophils"],
+    correctAnswer: 1, 
+    imageUrl: "https://i.imgur.com/kR7zi4R.png" 
+},
+{
+    question: "Which area is typically spared in Erythema toxicum neonatorum (ETN)?",
+    choices: ["Palms", "Soles", "Face", "Trunk"],
+    correctAnswer: 0,
+    imageUrl: "https://i.imgur.com/kR7zi4R.png" 
+},
+            {
+                question: "For a patient found unconscious in the street with multiple bullae (coma bullae), what's the best management?",
+                choices: ["Hydrocolloid dressing", "Switch patient position", "Steroid"],
+                correctAnswer: 1
+            },
+            {
+                question: "What cell finding is associated with Erythema toxicum neonatorum?",
+                choices: ["Eosinophils"],
+                correctAnswer: 0
+            },
+            {
+                question: "For a male patient with EDS vascular type, what's a significant complication?",
+                choices: ["Uterine rupture"],
+                correctAnswer: 0, 
+                imageUrl: "https://i.imgur.com/1OOUguC.png"
+            },
+            {
+                question: "This picture asking about association with syndrome",
+                choices: ["Noonan syndrome"],
+                correctAnswer: 0,
+                imageUrl: 'https://i.imgur.com/XvBXhUL.png'
+            },
+            {
+    question: "similar picture asking about treatment",
+    choices: ["Long pulsed alexandrite"],
+    correctAnswer: 0,
+    imageUrl: "https://i.imgur.com/PAbwPg1.png" 
+},
+            {
+                question: "What's true about Botox for hyperhidrosis?",
+                choices: ["Approved for palmar hyperhidrosis", "Does not cause muscle weakness", "Side effects are short-lived", "Compensatory hyperhidrosis has been observed"],
+                correctAnswer: 2,
+                imageUrl: 'https://i.imgur.com/8dU28Hv.png'
+            },
+            {
+                question: "Which antibody in dermatomyositis is associated with cardiac involvement?",
+                choices: ["Mi2", "SAE", "SRP", "Jo"],
+                correctAnswer: 2
+            },
+            {
+                question: "What predicts the worst prognosis in scleroderma?",
+                choices: ["Young, African female", "Old African male", "Old African with lung involvement and anti SCl-70", "Young female African"],
+                correctAnswer: 1
+            },
+            {
+                question: "What's involved in the pathogenesis of scleroderma?",
+                choices: ["Increased fibroblast", "Increased connective tissue growth factor (CTGF)"],
+                correctAnswer: 1
+            },
+            {
+                question: "For a patient with scleroderma presenting with Raynaud's phenomena and allergy to amlodipine, what's the best treatment?",
+                choices: ["Nifedipine", "Prazosin"],
+                correctAnswer: 1,
+                imageUrl: 'https://i.imgur.com/zuXJkNr.png'
+            },
+            {
+                question: "A patient presented with sudden painful skin changes. Histopathology is shown. Most likely diagnosis is:",
+                choices: ["Scleroderma", "Eosinophilic fasciitis", "Nephrogenic systemic fibrosis", "Other"],
+                correctAnswer: 1,
+                imageUrl: 'https://i.imgur.com/GWzk7jY.png'
+            },
+            {
+                question: "A patient developed symmetric hardening of the skin and also has yellowish ocular changes. Most likely diagnosis is:",
+                choices: ["Nephrogenic systemic fibrosis"],
+                correctAnswer: 0,
+                imageUrl: 'https://i.imgur.com/0qavF7L.png'
+            },
+            {
+                question: "A patient with morphea developed bullous lesions. What's the mechanism?",
+                choices: ["Lymphedema"],
+                correctAnswer: 0
+            },
+            {
+                question: "A patient developed hardening of the skin. Histopathology shows foreign body granuloma. What's the diagnosis?",
+                choices: ["Foreign body granuloma", "Connective tissue disease (morphea)", "Sarcoidosis"],
+                correctAnswer: 0,
+                imageUrl: 'https://i.imgur.com/uqqodaN.png'
+            },
+            {
+                question: "In Muckle-Wells syndrome, what's the diagnosis based on?",
+                choices: ["Chronic urticarial papules lasting for 1-2 days with fever and abdominal pain"],
+                correctAnswer: 0,
+                imageUrl: 'https://i.imgur.com/oP6mqwF_d.webp?maxwidth=760&fidelity=grand'
+            },
+            {
+                question: "For a patient with bullous lesions showing DIF of PCT, what's the next step?",
+                choices: ["Urinary porphyrins"],
+                correctAnswer: 0,
+                imageUrl: 'https://i.imgur.com/eyxjXAf.png'
+            },
+            {
+    question: " Scenario patient with skin rash, all over the neck and peripheral neuropathy and burning sensation ( maybe was about hartnub syndrome ) Asking about what supplement could improve it",
+    choices: ["Niacin B3", "Vitamin D", "Vitamin C", "Zinc"],
+    correctAnswer: 0, 
+    imageUrl: "https://i.imgur.com/K3rGHlt.png" 
+},,
+{
+    question: "Q30 old patient with scaly psoriasiform rash over lower back extending to the buttock , level of what can help in the diagnosis",
+    choices: ["Urinary zinc", "Enzyme zinc dependent", "Enzyme ALP"],
+    correctAnswer: 2, // Index of "Enzyme ALP"
+    imageUrl: "https://i.imgur.com/w1MpQjQ.png" // Replace with actual image URL
+},
+            {
+                question: "A patient with Palmoplantar keratoderma and esophageal findings. What's the gene involved?",
+                choices: ["TOC"],
+                correctAnswer: 0,
+                imageUrl: 'https://i.imgur.com/4eJmz7T.png'
+            },
+            {
+    question: "Q31 Exact picture ... what's the next step",
+    choices: ["Chest CT"],
+    correctAnswer: 0, // Index of "Chest CT"
+    imageUrl: "https://i.imgur.com/xcpWoDG.png" // Replace with actual image URL
+},
+            {
+                question: "In a patient with tuberous sclerosis and depigmented spots, what's the mechanism?No answer for this question*** look for the pic",
+                choices: ["Absent melanocytes", "Absent melanosomes", "Decrease melanin synthesis", "Decrease melanin"],
+                correctAnswer: 0,
+                imageUrl: "https://i.imgur.com/bNvAYuO.png"
+            },
+            {
+    question: "Q35 histopathology of sclerotic fibroma, asking about what's a characteristic finding in this patient",
+    choices: [
+        "Macrocephaly and follicular thyroid",
+        "Papillary thyroid and ...."
+    ],
+    correctAnswer: 0, // Index of "Macrocephaly and follicular thyroid ,(answer.)"
+},
+            {
+                question: "What feature can be seen in a male patient with tuberous sclerosis?",
+                choices: ["Ovarian cystadenoma"],
+                correctAnswer: 0
+            },
+            {
+                question: "Similar histopathology to sclerotic fibroma is shown. What's the next step?",
+                choices: ["Colonoscopy"],
+                correctAnswer: 0,
+                imageUrl: 'https://i.imgur.com/QXXOd0n.png'
+            },
+            {
+                question: "A 20-year-old patient has premature graying of hair, wrinkled skin, absence of fatty tissue, bird-like face, and had coronary artery disease two years ago. What's the most likely diagnosis?*** no answer to this question**",
+                choices: ["De Barsy syndrome", "Hutchinson-Gilford progeria syndrome"],
+                correctAnswer: 1
+            },
+            {
+                question: "A 3-year-old boy has scaly, erythematous rash diagnosed as psoriasis that didn't improve with topical treatment. What's the best option for this patient?",
+                choices: ["Etanercept", "Adalimumab", "Secukinumab"],
+                correctAnswer: 2
+            },
+            {
+                question: "A pediatric patient has multiple hypopigmented lesions on the face. What's the best management?",
+                choices: ["Potent topical steroid", "Topical antifungal", "Sunscreen"],
+                correctAnswer: 2
+            },
+            {
+                question: "Two clinical questions both showed pictures of a syndrome, asking about the most common cause of death. What's the answer?",
+                choices: ["Leukemia", "Bone marrow failure", "Pulmonary", "Cardiac"],
+                correctAnswer: 1,
+                imageUrl: 'https://i.imgur.com/4GUlViJ.png'
+            },
+            {
+                question: "A patient with history of hidradenitis suppurativa, whose HS is controlled, has scaly reticulate lesions over the axilla and under breast. What's the best next step?",
+                choices: ["Type of antibiotic (minocycline)", "Genetic test"],
+                correctAnswer:1, 
+                imageUrl: 'https://i.imgur.com/51qDUs8.png' 
+            },
+            {
+                question: "A patient was started on cyclosporine. This would worsen:",
+                choices: ["Muscle twitching and pain", "Gout"],
+                correctAnswer: 1,
+                imageUrl: 'https://i.imgur.com/bwYvle9.png'
+            },
+            {
+    question: "Dermoscopic picture : What is the diagnosis based on the dermoscopic findings?",
+    choices: ["Trichotillomania", "Alopecia Areata", "Tinea Capitis", "Lichen Planopilaris"],
+    correctAnswer: 0, 
+    imageUrl: 'https://i.imgur.com/BhZ0LXs.png'
+},
+{
+    question: "Q44 Dermoscopic picture : What is the diagnosis based on the dermoscopic findings?",
+    choices: ["Pigmented Basal Cell Carcinoma", "Melanoma", "Seborrheic Keratosis", "Dermatofibroma"],
+    correctAnswer: 0,
+    imageUrl: 'https://i.imgur.com/DrDJVt5.png'
+},
+{
+    question: "Q45 Regarding the treatment of BCC: What is the mechanism or name of the targeted therapy used for BCC?",
+    choices: ["Hedgehog pathway inhibitor", "BRAF inhibitor", "EGFR inhibitor", "CTLA-4 inhibitor"],
+    correctAnswer: 0, 
+},
+{
+    question: "Scenario patient with CCCA Asking about treatment other than steroid",
+    choices: ["Dutasteride", "HCQ", "Minocycline "],
+    correctAnswer: 2, // Index of "Minocycline ( answer )"
+    imageUrl: "https://i.imgur.com/bv8Wra0_d.webp?maxwidth=760&fidelity=grand" // Replace with actual image URL
+},
+{
+    question: "scenario patient with pic of ruffled cuticle What is the clinical finding",
+    choices: [" seldom need to cut her hair"],
+    correctAnswer: 0, // Index of the only choice provided
+    imageUrl: "https://i.imgur.com/PFBOWk8.png" // Replace with actual image URL
+},
+{
+    question: "Q48 exact picture Best treatment",
+    choices: ["Itraconazole", "Amphoteracin", "Surgical"],
+    correctAnswer: 2, // Index of "Surgical, ( answer )"
+    imageUrl: "https://i.imgur.com/AawMLzY.png" // Replace with actual image URL
+},
+{
+    question: "Q49 This histopath , most likely clinical picture is",
+    choices: ["Verrucus", "Keloidal", "Plaques"],
+    correctAnswer: 1, // Index of "Keloidal ( answer )"
+    imageUrl: "https://i.imgur.com/EW7po8r.png" // Replace with actual image URL
+},
+            {
+                question: "A patient has psoriasis not improved on topical and doesn't want to do injection or labs. What's the answer?",
+                choices: ["Apremilast"],
+                correctAnswer: 0
+            },
+            {
+                question: "A patient is following up for acne on minocycline. Developed joint pain, anemia, thrombocytopenia, and elevated bilirubin. What's the cause of anemia?",
+                choices: ["Minocycline", "Anemia of chronic disease"],
+                correctAnswer: 0,
+                imageUrl: 'https://i.imgur.com/xsVqCVb.png'
+            },
+            {
+                question: "A patient presented with a lesion since birth, increasing in size. Labs shown low platelet. What's the best treatment?",
+                choices: ["Vincristine"],
+                correctAnswer: 0,
+                imageUrl: 'https://i.imgur.com/xs4encg.png'
+            },
+            {
+                question: "A patient with angiofibroma. What's the pathology description?",
+                choices: ["cannot remember choices"],
+                correctAnswer: 0, 
+                imageUrl: 'https://i.imgur.com/komY0K5.png'
+            },
+            {
+                question: "1 patient presented with this lesion seen on pictures, patient is well Asymptomatic lesion for few months Labs shown ( Hgb 9 low )Best treatment is?",
+                choices: ["Cryotherapy", "Interferon", "Radiotherapy", "Chemotherapy"],
+                correctAnswer: 1,
+                imageUrl: 'https://i.imgur.com/bInkmFO.png'
+            },
+            {
+                question: "A 49-year-old patient with Bullous pemphigoid, well controlled, presented with oral pigmentation in the buccal region, reticulated, and palmer pigmentation. No internal involvement. What's the best diagnosis?**No Answer**",
+                choices: ["Addison's disease", "Laugier-Hunziker syndrome", "Peutz-Jeghers syndrome", "Carney complex"],
+                correctAnswer: 1,
+                imageUrl: 'https://i.imgur.com/9YGe9XE.png'
+            },
+            {
+    question: "Q93 old patient with peri oral lentigens, diarrhea and on colonoscopy polyps Best diagnosis is",
+    choices: ["Canada", "Peutz Jegher", "Lauiger Hunziker"],
+    correctAnswer: 0,
+    imageUrl: 'https://i.imgur.com/9YGe9XE.png'
+},
+
+            {
+                question: "In a scenario of SCC, which of the following is not considered a risk factor for metastasis?",
+                choices: ["Well-differentiated tumor"],
+                correctAnswer: 0,
+                imageUrl: 'https://i.imgur.com/NuYyT3E.png'
+            },
+            {
+                question: "A patient has this lesion. What mutation is most likely present?**No answer**",
+                choices: ["BRAF", "C-KIT", "RAS", "GNAQ"],
+                correctAnswer: 3,
+                imageUrl: 'https://i.imgur.com/RsENzYl.png'
+            },
+            {
+                question: "A patient has an asymptomatic lesion. What's the best treatment?",
+                choices: ["Antifungal oral and topical steroid on the edges"],
+                correctAnswer: 0,
+                imageUrl: 'https://i.imgur.com/wvcXu16.png'
+            },
+            {
+                question: "In a scenario of Hereditary Hemorrhagic Telangiectasia (HHT), what's the mode of inheritance?",
+                choices: ["Autosomal dominant"],
+                correctAnswer: 0,
+                imageUrl: 'https://i.imgur.com/QcVlelc.png'
+            },
+            {
+                question: "A similar picture is shown. What investigation can help the patient?",
+                choices: ["Fundoscopic exam"],
+                correctAnswer: 0,
+                imageUrl: 'https://i.imgur.com/REM44Yu.png'
+            },
+            {
+                question: "A 50-year-old patient with known hyperlipidemia on statin, otherwise medically free, developed erythematous plaques. Biopsy done shows granuloma. What's the most likely diagnosis?",
+                choices: ["Granuloma annulare", "Interstitial granulomatous dermatitis", "Sarcoidosis", "Rheumatoid nodules"],
+                correctAnswer: 1,
+                imageUrl: 'https://i.imgur.com/io9aOWo.png'
+            },
+            {
+                question: "A newborn presented with multiple yellowish papules, had one over the head and later had more over the trunk. Histopathology shows juvenile xanthogranuloma. What's the best treatment?",
+                choices: ["Surgical", "Vinblastine", "Reassurance"],
+                correctAnswer: 2,
+                imageUrl: 'https://i.imgur.com/9sFxJ80.png'
+            },
+            {
+                question: "A patient was diagnosed with TEN and received IVIG. What's a well-known side effect?",
+                choices: ["Vasculitis", "Bullous pemphigoid", "Dyshidrotic eczema"],
+                correctAnswer: 2
+            },
+            {
+            question: "A patient received Botox then developed drooping of the upper eyelid. What's the best management?",
+            choices: ["Botox into frontalis", "Iopidine drops ipsilateral", "Iopidine drops contralateral"],
+            correctAnswer: 1
+        },
+        {
+            question: "What's the mechanism of action for Iopidine drops in managing Botox-induced eyelid drooping?",
+            choices: ["Alpha adrenergic agonist"],
+            correctAnswer: 0
+        },
+        {
+            question: "A patient has an erythematous lesion, biopsy is shown. What's the best treatment?",
+            choices: ["Steroid", "Type of antibiotic"],
+            correctAnswer: 0
+        },
+        {
+            question: "After a chemical peel, which complication puts the patient at risk of scarring?",
+            choices: ["Persistent erythema", "Pain", "Impetiginization"],
+            correctAnswer: 0
+        },
+        {
+            question: "A patient with this clinical finding, diagnosis is most likely:",
+            choices: ["Vitiligo", "Chemical-induced depigmentation", "Steroid-induced depigmentation"],
+            correctAnswer: 2
+        },
+        {
+            question: "A patient developed alopecia areata one month ago and received intralesional steroid. After one month, the patient presented with this finding. What is the most likely diagnosis?",
+            choices: ["Steroid-induced alopecia", "En coup de sabre", "Other"],
+            correctAnswer: 0
+        },
+        {
+            question: "A patient presented with this finding. The patient has a history of breast cancer and received radiotherapy. What's the most likely diagnosis?",
+            choices: ["Angiosarcoma", "Radiation dermatitis"],
+            correctAnswer: 1
+        },
+        {
+            question: "A patient with this finding received first-line topical medication. If used systemically, what's a well-known side effect?",
+            choices: ["Acneiform eruption", "Hypertrichosis", "Paronychia", "Periorbital edema"],
+            correctAnswer: 0
+        },
+        {
+            question: "In a scenario of TTP, what medication causes a similar side effect?",
+            choices: ["Targeted therapy medications"],
+            correctAnswer: 0
+        },
+        {
+            question: "A pediatric patient presented with this skin eruption and showing a similar pathology. What's the diagnosis?",
+            choices: ["Pityriasis lichenoides et varioliformis acuta (PLEVA)"],
+            correctAnswer: 0
+        },
+        {
+            question: "A picture of a plant is shown. What does it cause?",
+            choices: ["Allergic contact dermatitis", "Irritant contact dermatitis"],
+            correctAnswer: 0
+        },
+        {
+            question: "A picture of a flap is shown. What type of flap is it?",
+            choices: ["Advancement", "Transposition", "Rotation", "Interpolation"],
+            correctAnswer: 1
+        },
+        {
+            question: "A patient with chronic kidney disease presents with inflammatory papules and pustules on the face that did not respond to prior treatment with topical medication and topical antibiotic. Which of these medications can be used?",
+            choices: ["Bactrim", "Doxycycline", "Cephalexin", "Minocycline"],
+            correctAnswer: 1
+        },
+        {
+            question: "A patient with a history of multiple skin cancers asks if he can take medication to decrease the risk. Which of the following is an appropriate option?",
+            choices: ["Niacinamide"],
+            correctAnswer: 0
+        },
+        {
+            question: "The patient shown in this figure is at high risk of:",
+            choices: ["Cutaneous T-cell lymphoma (CTCL)"],
+            correctAnswer: 0
+        },
+        {
+            question: "A patient presents for the treatment of rosacea with PDL but adds she needs to be at work tomorrow. What pulse duration is the most appropriate?",
+            choices: ["1.5ms", "3ms", "6ms", "10ms"],
+            correctAnswer: 3
+        },
+        {
+            question: "What's the best pulse duration unit for PDL?",
+            choices: ["Millisecond", "Nanosecond", "Picosecond", "Second"],
+            correctAnswer: 0
+        },
+        {
+            question: "In a scenario describing Schnitzler syndrome (recurrent wheals plus intermittent fevers, bone pain, arthralgia, monoclonal gammopathy), what's the treatment?",
+            choices: ["IL-1 blockade"],
+            correctAnswer: 0
+        },
+        {
+            question: "In a scenario of X-linked dominant inheritance without specifying gender, what's the risk of transmission?",
+            choices: ["25%", "50%", "75%", "100%"],
+            correctAnswer: 1
+        },
+        {
+            question: "A 50-year-old female with a history of mitral valve prolapse presents for basal cell carcinoma excision. What is the appropriate perioperative antibiotic prophylaxis?",
+            choices: ["No antibiotic is needed"],
+            correctAnswer: 0
+        },
+        {
+            question: "A clinical picture of a young girl with a skin finding is shown. She's at risk of:",
+            choices: ["Squamous cell carcinoma", "Chronic renal failure", "Sepsis"],
+            correctAnswer: 1
+        },
+        {
+            question: "A healthy boy develops this sudden skin rash. What laboratory value is elevated?",
+            choices: ["Anti-DNase B", "Atypical lymphocyte", "Anti-histone", "Aldolase"],
+            correctAnswer: 0
+        },
+        {
+            question: "For this newborn, what's the most appropriate next step of management?",
+            choices: ["PDL", "Ophthalmology referral", "Reassurance", "MRI"],
+            correctAnswer: 2
+        },
+        {
+            question: "Injection of filler at which location carries the highest risk of complication?",
+            choices: ["Temple", "Nasolabial fold", "Tear trough", "Forehead"],
+            correctAnswer: 2
+        },
+        {
+            question: "A patient with this finding has pathology at:",
+            choices: ["Hemidesmosomes", "Lamina lucida", "Lamina densa", "Sub-lamina densa"],
+            correctAnswer: 3
+        },
+        {
+            question: "A young woman presents with painful, pruritic papules with cold exposure on bilateral feet. She does not improve with cold avoidance and warm clothing. What is the best next step?",
+            choices: ["Nifedipine", "Hydroxychloroquine", "Aspirin", "Steroid"],
+            correctAnswer: 0
+        },
+        {
+            question: "During excisional surgery of large basal cell carcinoma, a 75 kg patient is given 42 mL of 1% lidocaine with epinephrine. What is the expected result?",
+            choices: ["No symptoms", "Sinus tachycardia", "Perioral paresthesia", "Muscle rigidity"],
+            correctAnswer: 0
+        },
+        {
+            question: "A 40-year-old man presents with atypical nevi on the trunk. Family history of melanoma in the mother at 70 years old. What is the appropriate diagnostic work-up to evaluate for malignancy?",
+            choices: ["Biopsy of several atypical nevi", "Genetic test for CDKN2A mutation", "Genetic test for BRAF mutation", "CT abdomen to screen for pancreatic cancer"],
+            correctAnswer: 1
+        },
+        {
+            question: "A scenario with picture of paramedian forehead flap is shown. What's the blood supply?",
+            choices: ["Supratrochlear", "Supraorbital", "Infraorbital"],
+            correctAnswer: 0
+        },
+        {
+            question: "What's the best repair for this defect?",
+            choices: ["Linear repair along the axis oriented vertically", "Linear repair along axis oriented horizontally", "Secondary intention", "Advancement/rotational repair with superior advancement of the mid cheek"],
+            correctAnswer: 0
+        },
+        {
+            question: "In a 6-year-old patient with an asymptomatic lesion for 1 year, what's the expected pathology?",
+            choices: ["Lichenoid band-like infiltrate over the DEJ and periadnexal infiltrate"],
+            correctAnswer: 0
+        },
+        {
+            question: "In a scenario of systemic sclerosis, what's the main cause of mortality?",
+            choices: ["Renal", "Pulmonary", "Cardiac"],
+            correctAnswer: 1
+        },
+        {
+            question: "In a scenario of Gorlin syndrome with bifid ribs, what's an early cancer to watch for?",
+            choices: ["Medulloblastoma"],
+            correctAnswer: 0
+        },
+        {
+            question: "In herpes virus infections, what's expected to be seen microscopically?",
+            choices: ["Cowdry A bodies (intranuclear inclusion)"],
+            correctAnswer: 0
+        },
+        {
+            question: "For a case of psoriasis with generalized and facial involvement, what's the best approach for phototherapy?",
+            choices: ["Must wear goggles", "Do phototherapy for the body and excimer for the face", "Don't wear anything with closed eyes"],
+            correctAnswer: 2
+        },
+        {
+            question: "A case of atopic dermatitis patient was started on JAK inhibitors (upadacitinib). What's the expected side effect that necessitates stopping treatment? (Labs show neutrophils around 0.9)",
+            choices: ["Neutropenia"],
+            correctAnswer: 0
+        },
+        {
+            question: "For a case of zoon balanitis, what's the best treatment?",
+            choices: ["Antibiotics", "Circumcision"],
+            correctAnswer: 1
+        },
+        {
+            question: "A case of CTCL on PUVA is starting ciprofloxacin for a UTI. What's the best approach?",
+            choices: ["Decrease the dose by 50%", "Decrease the dose by 25%", "Hold photo", "No need to change"],
+            correctAnswer: 2
+        },
+        {
+            question: "A patient with this finding (Adams-Oliver syndrome), what system is most likely affected?",
+            choices: ["Pulmonary", "Renal", "Cardiac"],
+            correctAnswer: 2
+        },
+        {
+            question: "A scenario of a patient who got sick and started to lose hair (telogen effluvium), what's expected?",
+            choices: ["Telogen hair > 20%"],
+            correctAnswer: 0
+        },
+        {
+            question: "In a case of neonatal lupus, what lab finding is expected?",
+            choices: ["Hyperbilirubinemia"],
+            correctAnswer: 0
+        },
+        {
+            question: "In a case of neonatal lupus, what antibody is associated?",
+            choices: ["Anti-Ro"],
+            correctAnswer: 0
+        },
+        {
+            question: "A scenario of a patient with HIV developing a skin lesion, biopsy done shown. What's the organism?",
+            choices: ["Staphylococcus"],
+            correctAnswer: 0
+        },
+        {
+            question: "In this patient post-surgical intervention, he developed this eruption which typically spares:",
+            choices: ["Nasal tip"],
+            correctAnswer: 0
+        },
+        {
+            question: "A scenario of a newborn 4 months with a small tail over the back. What's the next step?",
+            choices: ["US", "MRI"],
+            correctAnswer: 1
+        },
+        {
+            question: "A scenario of juvenile plantar dermatosis. What's the diagnosis?",
+            choices: ["Allergic contact dermatitis"],
+            correctAnswer: 0
+        },
+        {
+            question: "For juvenile plantar dermatosis, what test aids in diagnosis?",
+            choices: ["Patch test"],
+            correctAnswer: 0
+        },
+        {
+            question: "For juvenile plantar dermatosis, what's the best management?",
+            choices: ["Super absorbent socks, change frequently"],
+            correctAnswer: 0
+        },
+        {
+            question: "In a Lyme disease scenario, what stain is used?",
+            choices: ["Warthin-Starry"],
+            correctAnswer: 0
+        },
+        {
+            question: "What to avoid in nickel allergy?",
+            choices: ["Plastic pen", "iPad"],
+            correctAnswer: 1
+        },
+        {
+            question: "What to avoid in nickel allergy?",
+            choices: ["White gold", "Rose gold"],
+            correctAnswer: 0
+        },
+        {
+            question: "A 50-year-old patient with known colon cancer recently developed psoriasis not responding to treatment. To start biological therapy, which of these is appropriate?",
+            choices: ["Adalimumab", "Golimumab", "Ustekinumab"],
+            correctAnswer: 2
+        },
+        {
+            question: "This lesion is at highest risk of developing:",
+            choices: ["BCC", "Trichoblastoma", "SCAP"],
+            correctAnswer: 1
+        },
+        {
+            question: "A picture similar to Riehl's melanosis on the face is shown. What's the allergic substance?",
+            choices: ["Colophony", "D-limonene"],
+            correctAnswer: 1
+        },
+        {
+            question: "A description of subacute cutaneous lupus (psoriasiform rash worsened with sun) is given. What's the diagnosis?",
+            choices: ["Subacute cutaneous lupus erythematosus"],
+            correctAnswer: 0
+        },
+        {
+            question: "For pityriasis rosea in a pediatric patient, what's the treatment?",
+            choices: ["Erythromycin"],
+            correctAnswer: 0
+        },
+        {
+            question: "What's a side effect of anabolic steroids?",
+            choices: ["Hyperkalemia", "Lipid profile abnormality"],
+            correctAnswer: 1
+        },
+        {
+            question: "A picture of oral ulcer (probably pemphigus) is shown. What's the most common side effect of the FDA-approved treatment (rituximab)?",
+            choices: ["Drug eruption"],
+            correctAnswer: 0
+        },
+        {
+            question: "For eosinophilic folliculitis, what's the next step?",
+            choices: ["HIV test"],
+            correctAnswer: 0
+        },
+        {
+            question: "What therapy is used for scalp actinic keratosis?",
+            choices: ["Photodynamic therapy"],
+            correctAnswer: 0
+        },
+        {
+            question: "For sarcoidosis, what's the next step after histopathology?",
+            choices: ["Chest X-ray"],
+            correctAnswer: 0
+        },
+        {
+            question: "A scenario of a patient with SLE who committed suicide using one of her medications. The cause is cardiac. Which medication?",
+            choices: ["Hydroxychloroquine"],
+            correctAnswer: 0
+        },
+        {
+            question: "A patient developed this lesion. What's the cause?",
+            choices: ["NSAID", "Voriconazole"],
+            correctAnswer: 1
+        },
+        {
+            question: "A picture of chilblain is shown. What mutation is associated?",
+            choices: ["TREX1"],
+            correctAnswer: 0
+        },
+        {
+            question: "A picture of a patient with juvenile xanthogranuloma is shown. What's true?",
+            choices: ["CD207 negative"],
+            correctAnswer: 0
+        },
+        {
+            question: "What's the most common complication for laser (PDL) used for this lesion?",
+            choices: ["Bruising"],
+            correctAnswer: 0
+        },
+        {
+            question: "What's the absolute risk reduction in this scenario?",
+            choices: ["Calculated value based on the data provided"],
+            correctAnswer: 0
+        },
+        {
+            question: "What's the sensitivity in this scenario?",
+            choices: ["Calculated value based on the data provided"],
+            correctAnswer: 0
+        },
+        {
+            question: "How can communication errors between different medical teams in the hospital be minimized?",
+            choices: ["Implement standardized communication protocols"],
+            correctAnswer: 0
+        },
+        {
+            question: "In a case of urticaria vasculitis, what's the most common lab finding?",
+            choices: ["Hypocomplementemia"],
+            correctAnswer: 0
+        },
+        {
+            question: "A case of a black patient with unusual skin manifestations. Within a couple of years, the patient developed multiple hyperkeratotic and hyperpigmented papules and plaques all over the body, hypertrophic lesions over the genital area. Labs show hypereosinophilia. What's the diagnosis?",
+            choices: ["Papular eruption of blacks", "Pachydermatous eosinophilic dermatitis"],
+            correctAnswer: 1
+        },
+        {
+            question: "A case of Merkel cell carcinoma, biopsied done, showed small cell (no sentinel lymph node). What's the next step?",
+            choices: ["Wide local excision", "Radiotherapy", "Chemotherapy"],
+            correctAnswer: 0
+        },
+        {
+            question: "Green nail syndrome is shown. What's the next step?",
+            choices: ["Sodium hypochlorite"],
+            correctAnswer: 0
+        },
+        {
+            question: "A patient was diagnosed with lichen planopilaris and was planned to start medication that works on Peroxisome proliferator-activated receptors. What medication is it?",
+            choices: ["Pioglitazone"],
+            correctAnswer: 0
+        },
+        {
+            question: "A patient with this finding is shown. What's the next step?",
+            choices: ["Renal studies", "Pelvic x-ray"],
+            correctAnswer: 1
+        },
+        {
+            question: "A pediatric patient presents with complaints of brittle, wooly hair. What system is most likely affected?",
+            choices: ["Cardiac"],
+            correctAnswer: 0
+        },
+        {
+            question: "In a scenario about carcinoid syndrome, what's the key feature?",
+            choices: ["Flushing and diarrhea"],
+            correctAnswer: 0
+        },
+        {
+            question: "A case on JAK inhibitor, asking about side effect. What's a common side effect?",
+            choices: ["Herpes zoster"],
+            correctAnswer: 0
+        },
+        {
+            question: "In a scenario clearly describing CREST syndrome (telangiectasia, distal sclerosis, Raynaud's), which antibody is associated?",
+            choices: ["Anti-centromere"],
+            correctAnswer: 0
+        },
+        {
+            question: "A pathology picture is shown. What's the diagnosis?",
+            choices: ["Granuloma faciale"],
+            correctAnswer: 0
+        },
+        {
+            question: "A picture of quizzical or 'cockeyed' appearance is shown, pointing to lateral fibers of frontalis muscle. This occurred due to:",
+            choices: ["Lateral fibers of Frontalis muscle have been injected inadequately"],
+            correctAnswer: 0
+        },
+        {
+            question: "A case of a pediatric patient who had these lesions (attached picture with follicular erythematous scaly papules on the dorsum of fingers), what else might he have?",
+            choices: ["Sclerodermoid skin changes"],
+            correctAnswer: 0
+        },
+        {
+            question: "In Netherton syndrome, if hair was taken from this patient, what would be the finding? The patient's hair was brittle.",
+            choices: ["Trichorrhexis invaginata", "Trichorrhexis nodosa"],
+            correctAnswer: 0
+        },
+        {
+            question: "In Netherton syndrome, to examine the hair, what's the best site to take the hair from?",
+            choices: ["Eyebrows", "Eyelashes"],
+            correctAnswer: 0
+        },
+        {
+            question: "A case of a pediatric patient who is a known case of atopic dermatitis, developed new lesions over the past few days. Picture of eroded papules over the eczematous plaques in the face of baby is shown. What to give?",
+            choices: ["Acyclovir"],
+            correctAnswer: 0
+        },
+        {
+            question: "A case of severe itchiness in CTCL patient. What to give?",
+            choices: ["Aprepitant"],
+            correctAnswer: 0
+        },
+        {
+            question: "A case with urticarial eruption, arthritis, lymphadenopathy, and hyperferritinemia. What is the diagnosis?",
+            choices: ["Adult-onset Still's disease"],
+            correctAnswer: 0
+        },
+        {
+            question: "A scenario describing slowly growing lesion on the dorsum of hands with small papules in the edges of the expanding lesions, possibly Granuloma annulare. What to do next (no lipids mentioned)?",
+            choices: ["Hemoglobin A1C"],
+            correctAnswer: 0
+        },
+        {
+            question: "A case of AGEP, eruptive pustules develop in the patient, labs attached showed high neutrophils. What is the most likely culprit?",
+            choices: ["Penicillin"],
+            correctAnswer: 0
+        },
+        {
+            question: "An adult with clinical picture of small vessel vasculitis, IgA positive, what is the next step in management?",
+            choices: ["Lung CT", "SPEP"],
+            correctAnswer: 0
+        },
+        {
+            question: "A case of rosacea with ocular symptoms. What is the treatment?",
+            choices: ["Doxycycline"],
+            correctAnswer: 0
+        },
+        {
+            question: "What's the most specific antibody for Sjögren syndrome?",
+            choices: ["Anti-alpha-fodrin"],
+            correctAnswer: 0
+        },
+        {
+            question: "A patient known case of RA, has leg ulcers, labs shows low WBC's. What is he at risk for?",
+            choices: ["Lymphoma"],
+            correctAnswer: 0
+        },
+        {
+            question: "A clinical picture is shown. What to do next?",
+            choices: ["Hemoglobin A1C"],
+            correctAnswer: 0
+        },
+        {
+            question: "In a case of alopecia areata, what's the first cell to respond?",
+            choices: ["CD8", "CD4"],
+            correctAnswer: 0
+        },
+        {
+            question: "A picture of nail pits is shown. Where's the defect?",
+            choices: ["Nail matrix"],
+            correctAnswer: 0
+        },
+        {
+    question: "patient with histopath taken from alopecia. What’s the most likely finding on dermoscopy?",
+    choices: ["Yellow dots", "White dots", "Black dots"],
+    correctAnswer: 0,
+    imageUrl: "https://i.imgur.com/ZIfmrgl.png"
+},
+
+        {
+            question: "A case of a patient treated with laser for facial pigmentation then developed this lesion (Attached blue pigmented patch in the cheek). What is the cause?",
+            choices: ["Gold therapy"],
+            correctAnswer: 0
+        },
+        {
+            question: "A clinical picture is shown. What's the diagnosis?",
+            choices: ["Atrophoderma of Pasini and Pierini"],
+            correctAnswer: 0
+        },
+        {
+            question: "What's the mechanism of Itraconazole in treating onychomycosis?",
+            choices: ["Inhibition of ergosterol synthesis"],
+            correctAnswer: 0
+        },
+        {
+    question: "Q50 exact pic Most likely diagnosis is",
+    choices: ["Crypto"],
+    correctAnswer: 0,
+    imageUrl: "https://i.imgur.com/Ecvqt8x.png" // Replace with actual image URL
+},
+{
+    question: "Q51 similar picture Newborn 1-2 month old has a one week history of diarrhea, presented with the skin lesion and pain with diaper change Most likely diagnosis is ( or asking about next step )**No answer** ",
+    choices: ["Diaper rash", "Herpes"],
+    correctAnswer: -1, // Correct answer is not clearly specified
+    imageUrl: "https://i.imgur.com/KAoZxr2.png" // Replace with actual image URL
+},
+{
+    question: "52 Picture of patient with eczema herpaticum asking about what gene increase the risk",
+    choices: ["Loricrin", "Fillagrin (answer)"],
+    correctAnswer: 1, // Index of "Fillagrin (answer)"
+    imageUrl: "https://i.imgur.com/ILNrPCM.png" // Replace with actual image URL
+},
+        {
+            question: "A clinical picture of Hand, Foot, and Mouth Disease is shown. The patient recently returned from Malaysia and also complains of malaise and GI symptoms. What's the organism? 16 or 71 because of Asia pacific Malaysia should has cardio complplication bbut is wat not mentioned in the Q ",
+            choices: ["Coxsackievirus A6", "Coxsackievirus A16", "Enterovirus 71", "Rotavirus"],
+            correctAnswer: 2, 
+            imageUrl: 'https://i.imgur.com/msPsuem.png'
+        },
+        {
+            question: "What's the organism in this exact picture?",
+            choices: ["Tunga penetrans"],
+            correctAnswer: 0,
+            imageUrl:'https://i.imgur.com/EQ39Dx7.png'
+        },
+       
+        {
+            question: "A male with diffuse prurigo nodularis and itchiness, labs are normal. What's elevated?",
+            choices: ["Anti BP180", "Bilirubin", "Creatinine"],
+            correctAnswer: 1
+        },
+        {
+            question: "A patient has a skin lesion (macular coalescing into patch) over the forehead since birth. Patient developed nodularity, biopsy showed melanoma. What's the most likely acquired mutation?",
+            choices: ["NRAS", "BRAF", "BAP1"],
+            correctAnswer: 2
+        },
+        {
+            question: "A patient with CTCL was started on extracorporeal photopheresis. What's the mechanism of action?",
+            choices: ["see pic"],
+            correctAnswer: 0,
+            imageUrl: 'https://i.imgur.com/zngEK8o.png'
+        },
+        {
+            question: "A patient was treated for genital warts and came with this eruption (picture of penile depigmentation). What was likely used?",
+            choices: ["Imiquimod", "5-FU"],
+            correctAnswer: 0
+        },
+        {
+            question: "In comparison with acitretin, isotretinoin is more associated with:",
+            choices: ["Blepharoconjunctivitis", "Keratitis", "Corneal opacities", "Nyctalopia"],
+            correctAnswer: 2,
+            imageUrl: 'https://i.imgur.com/qOFJvDv.png'
+        },
+        {
+            question: "In a clinical picture of mastocytosis, what's the marker of the original cell?",
+            choices: ["CD34"],
+            correctAnswer: 0,
+            imageUrl: 'https://i.imgur.com/6DKNNOG.png'
+        },
+        {
+            question: "For a patient with actinic keratosis, what's the correct percent and schedule for treatment?",
+            choices: ["5% 5-FU twice daily for 2-4 weeks"],
+            correctAnswer: 0,
+            imageUrl: 'https://i.imgur.com/e4jntgu.png'
+        },
+        {
+            question: "Subcutaneous nodules and plaques over the lower extremities, histopath report shows 'bean bag' appearance. What's the diagnosis?",
+            choices: ["Cytophagic histiocytic panniculitis"],
+            correctAnswer: 0,
+            imageUrl: 'https://i.imgur.com/zSYvBUg.png'
+        },
+        {
+            question: "A newborn presented with indurated plaques (Subcutaneous fat necrosis). What's seen on histology?",
+            choices: ["Foci of calcification"],
+            correctAnswer: 0,
+            imageUrl: 'https://i.imgur.com/iWSkkCJ.png'
+        },
+        {
+            question: "A newborn with diaper rash received topical medication without improvement. What's the best next step?",
+            choices: ["Use topical antifungal with topical steroid", "Skin biopsy"],
+            correctAnswer: 1,
+            imageUrl: 'https://i.imgur.com/DdpdBCr.png'
+        },
+        {
+            question: "A female patient with a history of TIA and livedo reticularis. What's the best treatment?",
+            choices: ["Anticoagulant"],
+            correctAnswer: 0
+        },
+        {
+            question: "This exact clinical image is shown (likely pityriasis rosea). What's the best intervention?**No answer**",
+            choices: ["Steroid", "Dapsone", "Reassurance"],
+            correctAnswer: 2,
+            imageUrl: 'https://i.imgur.com/bd3fUEm.png'
+        },
+        {
+            question: "This clinical picture is shown (likely indicating HIV-related skin condition). What's the next step?",
+            choices: ["HIV test"],
+            correctAnswer: 0,
+            imageUrl: 'https://i.imgur.com/YvvfyYW.png'
+        },
+        {
+            question: "A scenario of a patient with multiple palpable purpura, asthma, labs showed high eosinophils. What's the best next step?",
+            choices: ["Renal study"],
+            correctAnswer: 0,
+            imageUrl: "https://i.imgur.com/01iYenq.png"
+        },
+        {
+            question: "A scenario of a patient with recurrent swelling of the perioral and ocular areas (angioedema), systemic features, labs show high eosinophils. What's the best treatment target?",
+            choices: ["IL-1", "TNF", "IL-5"],
+            correctAnswer: 2,
+            imageUrl: 'https://i.imgur.com/JRKJSlP.png'
+        },
+        {
+            question: "In Lyme disease, what pathogenic feature enhances transmission in the bacteria?",
+            choices: ["Slap 15"],
+            correctAnswer: 0,
+            imageUrl: 'https://i.imgur.com/th954xA.png'
+        },
+        {
+            question: "A patient with recurrent eruption, biopsy taken. What's the best management?",
+            choices: ["Steroid", "Dapsone", "Acyclovir"],
+            correctAnswer: 2,
+            imageUrl: 'https://i.imgur.com/W1MU8Pt.png'
+        },
+        {
+            question: "A picture of vitiligo-like lesion perioral is shown. What's the causative agent?",
+            choices: ["Lapatinib", "Sorafenib", "Sunitinib", "Vandetanib"],
+            correctAnswer: 2,
+            imageUrl: 'https://i.imgur.com/FaRDjec.png'
+        },
+        {
+            question: "A scenario of a patient on pembrolizumab who developed erythematous scaly plaques and papules. What's the most likely histopathological finding?*Not sure*",
+            choices: ["Lichenoid reaction", "Psoriasiform reaction", "Spongiotic dermatitis"],
+            correctAnswer: 0,
+            imageUrl: "https://i.imgur.com/FtJZe3A.png"
+        },
+        {
+            question: "A pediatric patient with retiform purpura, labs positive for bacterial strep. What's the most important prognostic lab finding?*Not sure*",
+            choices: ["PT", "Platelets"],
+            correctAnswer: 0
+        },
+        {
+            question: "A patient with melanoma, biopsy done showed depth 5.8 mm. What's the recommended excision margin?",
+            choices: ["2 centimeters"],
+            correctAnswer: 0,
+            imageUrl: 'https://i.imgur.com/N1OEwxp.png'
+        },
+        {
+            question: "After tumor thickness in melanoma, what's the most important pathological prognostic feature?",
+            choices: ["Clark level", "Vascular invasion", "Lymphocytic infiltration"],
+            correctAnswer: 1,
+            imageUrl: 'https://i.imgur.com/lqPbyu0.png'
+        },
+        {
+            question: "What type of filler is shown in this exact picture?",
+            choices: ["Calcium hydroxylapatite"],
+            correctAnswer: 0,
+            imageUrl: 'https://i.imgur.com/iatmMMf.png'
+        },
+        {
+            question: "A scenario of a patient who received sclerosing therapy and developed vomiting, headache. What's the most likely sclerosing agent used?",
+            choices: ["Polidocanol"],
+            correctAnswer: 0
+        },
+        {
+            question: "An anatomy picture of nerves is shown, pointing at the temporal branch of facial nerve. If injured, what's the finding?",
+            choices: ["Inability to elevate the frontalis ipsilaterally"],
+            correctAnswer: 0,
+            imageUrl: 'https://i.imgur.com/D7YZ6xq.png'
+        },
+        {
+            question: "What's the diagnosis for this exact picture?",
+            choices: ["Jessner's lymphocytic infiltrate"],
+            correctAnswer: 0,
+            imageUrl: 'https://i.imgur.com/FZSnwDW.png'
+        },
+        {
+            question: "What's the diagnosis for this exact picture showing annular lesions?",
+            choices: ["Granuloma annulare"],
+            correctAnswer: 0,
+            imageUrl: 'https://i.imgur.com/frifzhh.png'
+        },
+        {
+            question: "A patient with this finding on biopsy most likely has a mutation in which gene?",
+            choices: ["KRT17 (Keratin 17)"],
+            correctAnswer: 0,
+            imageUrl: 'https://i.imgur.com/7WPnwzu.png'
+        },
+        {
+            question: "Patient failed treatment with antibiotic for acne and was started on 5alpha re-educates Inhibitors What’s correc",
+            choices: ["Reduces sebum production", "Side effects are idiosyncratic", "Improvement seen in 1/3 of patients", "Clinical response in 8 weeks"],
+            correctAnswer: 0,
+            imageUrl: 'https://i.imgur.com/9JXHxTx.png'
+        },
+        ];
+
+        let currentQuestion = 0;
+        let wrongAnswers = [];
+        let userAnswers = new Array(questions.length).fill(null);
+
+        function loadSavedAnswers() {
+            const savedAnswers = localStorage.getItem('dermatologyQuizAnswers');
+            if (savedAnswers) {
+                userAnswers = JSON.parse(savedAnswers);
+            }
+        }
+
+        function saveAnswers() {
+            localStorage.setItem('dermatologyQuizAnswers', JSON.stringify(userAnswers));
+        }
+
+        function displayQuestion() {
+            const question = questions[currentQuestion];
+            let questionHTML = `
+                <div class="question">
+                    <h2>Question ${currentQuestion + 1}</h2>
+                    <p>${question.question}</p>
+                    ${question.imageUrl ? `
+                        <button class="show-image-btn" onclick="toggleImage()">Click here for the image</button>
+                        <div class="image-container">
+                            <img src="${question.imageUrl}" alt="Question image">
+                        </div>
+                    ` : ''}
+                    <ul class="choices">
+            `;
+
+            question.choices.forEach((choice, index) => {
+                const isSelected = userAnswers[currentQuestion] === index;
+                questionHTML += `
+                    <li class="choice ${isSelected ? (index === question.correctAnswer ? 'correct' : 'incorrect') : ''}" 
+                        onclick="selectAnswer(${index})">${choice}</li>
+                `;
+            });
+
+            questionHTML += `
+                    </ul>
+                </div>
+            `;
+
+            document.getElementById('quiz').innerHTML = questionHTML;
+            updateNavigation();
+        }
+
+        function toggleImage() {
+            const imageContainer = document.querySelector('.image-container');
+            if (imageContainer) {
+                imageContainer.style.display = imageContainer.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+
+        function selectAnswer(choiceIndex) {
+            userAnswers[currentQuestion] = choiceIndex;
+            saveAnswers();
+            const choices = document.querySelectorAll('.choice');
+            choices.forEach((choice, index) => {
+                choice.classList.remove('correct', 'incorrect');
+                if (index === questions[currentQuestion].correctAnswer) {
+                    choice.classList.add('correct');
+                } else if (index === choiceIndex && index !== questions[currentQuestion].correctAnswer) {
+                    choice.classList.add('incorrect');
+                }
+            });
+            updateNavigation();
+        }
+
+        function updateNavigation() {
+            document.getElementById('prev').disabled = currentQuestion === 0;
+            document.getElementById('next').disabled = currentQuestion === questions.length - 1;
+
+            const questionNav = document.getElementById('question-nav');
+            questionNav.innerHTML = '';
+            for (let i = 0; i < questions.length; i++) {
+                const button = document.createElement('button');
+                button.textContent = i + 1;
+                button.onclick = () => goToQuestion(i);
+                if (i === currentQuestion) {
+                    button.classList.add('current');
+                }
+                if (userAnswers[i] !== null) {
+                    if (userAnswers[i] === questions[i].correctAnswer) {
+                        button.classList.add('correct');
+                    } else {
+                        button.classList.add('incorrect');
+                    }
+                }
+                questionNav.appendChild(button);
+            }
+        }
+
+        function goToQuestion(questionIndex) {
+            currentQuestion = questionIndex;
+            displayQuestion();
+        }
+
+        function goToPreviousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                displayQuestion();
+            }
+        }
+
+        function goToNextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                displayQuestion();
+            }
+        }
+
+        document.getElementById('prev').addEventListener('click', goToPreviousQuestion);
+        document.getElementById('next').addEventListener('click', goToNextQuestion);
+
+        document.getElementById('start-wrong-answers').addEventListener('click', () => {
+            wrongAnswers = userAnswers.reduce((wrong, answer, index) => {
+                if (answer !== questions[index].correctAnswer) {
+                    wrong.push(index);
+                }
+                return wrong;
+            }, []);
+
+            if (wrongAnswers.length > 0) {
+                currentQuestion = wrongAnswers[0];
+                displayQuestion();
+            } else {
+                alert('No wrong answers to review!');
+            }
+        });
+
+        document.getElementById('submit-quiz').addEventListener('click', () => {
+            let score = 0;
+            for (let i = 0; i < questions.length; i++) {
+                if (userAnswers[i] === questions[i].correctAnswer) {
+                    score++;
+                }
+            }
+            const scoreDisplay = document.getElementById('score-display');
+            scoreDisplay.textContent = `Your score: ${score} out of ${questions.length}`;
+        });
+
+        document.getElementById('reset-quiz').addEventListener('click', () => {
+            if (confirm('Are you sure you want to reset the quiz? This will clear all your answers.')) {
+                localStorage.removeItem('dermatologyQuizAnswers');
+                userAnswers = new Array(questions.length).fill(null);
+                currentQuestion = 0;
+                displayQuestion();
+            }
+        });
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowLeft') {
+                goToPreviousQuestion();
+            } else if (event.key === 'ArrowRight') {
+                goToNextQuestion();
+            }
+        });
+
+        // Load saved answers and start the quiz
+        loadSavedAnswers();
+        displayQuestion();
+    </script>
+</body>
+</html>
